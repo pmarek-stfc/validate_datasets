@@ -26,13 +26,13 @@ def has_variables(ds, variables):
         return False
 
 
-def has_attribute(ds, variable, name, value, attr_type=None):
+def has_attribute(ds, variable, value):
     try:
         attr = ds[variable].attrs
         if attr:
             result = attr['units']
-            if result:
-                return True
+            if result == value and isinstance(result, str):
+                    return True
         return False
     except Exception:
         return False
@@ -79,7 +79,7 @@ def main():
     files = glob.glob(absolute_path + '/tas_Amon*.nc')
 
     opened = open_dataset(files[0])
-    print(has_coordinates(opened, ['time', 'lat', 'lon']))
+    print(has_attribute(opened, 'tas', 'K'))
 
 
 if __name__=='__main__':
