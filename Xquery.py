@@ -5,6 +5,14 @@ import glob
 
 
 def has_coordinates(ds, coords):
+    """
+        Check if given coordinates are included
+        in a dataset
+
+    :param ds: opened NetCDF4 file
+    :param coords: list of coordinates like ['time', 'lat', 'lon']
+    :return: Boolean
+    """
     try:
         idx = list(ds.indexes.keys())
     except Exception:
@@ -16,6 +24,14 @@ def has_coordinates(ds, coords):
 
 
 def has_variables(ds, variables):
+    """
+        Check if given variables are included
+        in a dataset
+
+    :param ds: opened NetCDF4 file
+    :param variables: list of variables like ['tas', 'uas']
+    :return: Boolean
+    """
     try:
         b = list(ds.data_vars.keys())
     except Exception:
@@ -26,6 +42,15 @@ def has_variables(ds, variables):
 
 
 def has_attribute(ds, variable, value):
+    """
+        Check if a variable holds a
+        desired value
+
+    :param ds: opened NetCDF4 file
+    :param variable: for example - 'tas'
+    :param value: for example - 'K'
+    :return: Boolean
+    """
     try:
         attr = ds[variable].attrs
     except Exception:
@@ -39,6 +64,13 @@ def has_attribute(ds, variable, value):
 
 
 def has_shape(ds, variable):
+    """
+        Check if a variable has a shape
+
+    :param ds: opened NetCDF4 file
+    :param variable: for example - 'tas'
+    :return: Boolean
+    """
     try:
         result = ds[variable].shape
     except Exception:
@@ -49,7 +81,16 @@ def has_shape(ds, variable):
     return False
 
 
-def is_in_range(ds, coord_variable, lower_bound, upper_bound, inclusive=True):
+def is_in_range(ds, coord_variable, lower_bound, upper_bound):
+    """
+        Check for a given range of a coordinate
+
+    :param ds: opened NetCDF4 file
+    :param coord_variable: for example - 'lat'
+    :param lower_bound: -80
+    :param upper_bound: 90
+    :return: Boolean
+    """
     try:
         lower_bnd = ds.coords[coord_variable].values[0]
         upper_bnd = ds.coords[coord_variable].values[-1]
@@ -81,7 +122,7 @@ def main():
     files = glob.glob(absolute_path + '/tas_Amon*.nc')
 
     opened = open_dataset(files[0])
-    # print(has_attribute(opened, 'tas', 'D'))
+    # print(has_attribute(opened, 'tas', 'K'))
     # print(has_shape(opened, 'tas'))
     # print(is_in_range(opened, 'lat', -70, 90))
     # print(has_variables(opened, ['tas', 'tasmax']))
