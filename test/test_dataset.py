@@ -4,8 +4,12 @@ Tests for xarray datasets.
 import pytest
 from dataset_utils import *
 
-fpath = 'xarray/tas_Amon_HadGEM2-CC_rcp45_r1i1p1_200512-203011.nc'
+fpath = 'badc/cmip5/data/cmip5/output1/MOHC/HadCM3/rcp45/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadCM3_rcp45_r1i1p1_200601-203012.nc'
 absolute_path = os.path.join(str(Path.home()), fpath)
+
+def open_dataset(file):
+    file_to_open = open_file(file)
+    return file_to_open
 
 
 def test_has_variables_success():
