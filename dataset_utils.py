@@ -17,7 +17,8 @@ def has_coordinates(ds, coords):
         idx = list(ds.indexes.keys())
     except Exception:
         return False
-
+    if len(coords) == 0:
+        raise ValueError('List of coordinates is empty!')
     if not len(idx) >= len(coords):
         return False
     return all([i == j for i, j in zip(idx, coords)])
@@ -32,12 +33,16 @@ def has_variables(ds, variables):
     :param variables: list of variables like ['tas', 'uas']
     :return: Boolean
     """
+
     try:
         b = list(ds.data_vars.keys())
     except Exception:
         return False
 
     c = set(variables)
+    if len(c) == 0:
+        raise ValueError('List of variables is empty!')
+
     return c.issubset(b)
 
 
@@ -45,7 +50,6 @@ def has_attribute(ds, variable, value):
     """
         Check if a variable holds a
         desired value
-
     :param ds: opened NetCDF4 file
     :param variable: for example - 'tas'
     :param value: for example - 'K'
@@ -94,6 +98,7 @@ def is_in_range(ds, coord_variable, lower_bound, upper_bound):
     try:
         lower_bnd = ds.coords[coord_variable].values[0]
         upper_bnd = ds.coords[coord_variable].values[-1]
+        print(lower_bnd, upper_bnd)
     except Exception:
         return False
 
@@ -122,11 +127,11 @@ def main():
     files = glob.glob(absolute_path + '/tas_Amon*.nc')
 
     opened = open_dataset(files[0])
-    # print(has_attribute(opened, 'tas', 'K'))
+    # print(has_attribute(opened, 1, 0, 1))
     # print(has_shape(opened, 'tas'))
-    # print(is_in_range(opened, 'lat', -70, 90))
-    # print(has_variables(opened, ['tas', 'tasmax']))
-    print(has_coordinates(opened, ['time', 'lat', 'lon']))
+    # print(is_in_range(opened, 'lon', 0, 360))
+    # print(has_variables(opened, []))
+    print(has_coordinates(opened, []))
 
 
 if __name__=='__main__':

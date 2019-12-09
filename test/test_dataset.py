@@ -1,29 +1,92 @@
 """
 Tests for xarray datasets.
 """
-
-import xarray as xr
-
+import pytest
 from dataset_utils import *
 
-
-def _good_dataset():
-    return xr.open_dataset('/badc/ecmwf-era-interim/data/gg/ap/2000/01/01/ggap200001010000.nc')
+fpath = 'xarray/tas_Amon_HadGEM2-CC_rcp45_r1i1p1_200512-203011.nc'
+absolute_path = os.path.join(str(Path.home()), fpath)
 
 
 def test_has_variables_success():
-    ds = _good_dataset()
+    ds = open_dataset(absolute_path)
 
-    variables = set(ds.data_vars)
-    expected = set(['Z', 'T', 'W', 'STRF', 'VPOT', 'U', 'V', 'R', 'VO', 'D', 'PV', 'Q', 'O3', 'CLWC', 'CIWC', 'CC'])
-    assert(variables == expected)
-
+    expected = set(['tas'])
+    assert has_variables(ds, expected) is True
 
 def test_has_variables_fail_wrong_vars():
-    ds = _good_dataset()
+    ds = open_dataset(absolute_path)
 
-    variables = set(ds.data_vars)
     expected = set(['rubbish', 'nodata'])
-    assert(variables != expected)
+    expected2 = set([1, 2])
+    assert has_variables(ds, expected) is False
+    assert has_variables(ds, expected2) is False
 
-    
+def test_has_variables_raise_empty_list_exception():
+    ds = open_dataset(absolute_path)
+
+    expected = set([])
+    with pytest.raises(ValueError):
+        has_variables(ds, expected)
+
+def test_has_coordinates_success():
+    ds = open_dataset(absolute_path)
+
+    expected = ['time', 'lat', 'lon']
+    expected2 = ['time', 'lat']
+    assert has_coordinates(ds, expected) is True
+    assert has_coordinates(ds, expected2) is True
+
+def test_has_coordinates_fail_wrong_coords():
+    ds = open_dataset(absolute_path)
+
+    expected = set(['rubbish', 'nodata'])
+    expected2 = set(['time', 'lat', 'lon', 'nodata'])
+    assert has_coordinates(ds, expected) is False
+    assert has_coordinates(ds, expected2) is False
+
+def test_has_coordinates_raise_empty_list_exception():
+    ds = open_dataset(absolute_path)
+
+    expected = set([])
+    with pytest.raises(ValueError):
+        has_coordinates(ds, expected)
+
+def test_has_attribute_success():
+    ds = open_dataset(absolute_path)
+
+    assert has_attribute(ds, 'tas', 'K') is True
+
+def test_has_attribute_fail_wrong_attribute():
+    ds = open_dataset(absolute_path)
+
+    assert has_attribute(ds, 'tas', 'J') is False
+    assert has_attribute(ds, 1, 'rubbish') is False
+    assert has_attribute(ds, ['tas', 'K'],'K') is False
+
+def test_has_shape_success():
+    ds = open_dataset(absolute_path)
+
+    expected = 'tas'
+    assert has_shape(ds, expected) is True
+
+def test_has_shape_fail_wrong_variable():
+    ds = open_dataset(absolute_path)
+
+    expected = 'tasmax'
+    expected2 = 0
+    expected3 = ['rubbish', 0, 'nodata']
+    assert has_shape(ds, expected) is False
+    assert has_shape(ds, expected2) is False
+    assert has_shape(ds, expected3) is False
+
+def test_is_in_range_success():
+    ds = open_dataset(absolute_path)
+
+    assert is_in_range(ds, 'lat', -70, 90) is True
+
+def test_is_in_range_fail_wrong_data():
+    ds = open_dataset(absolute_path)
+
+    assert is_in_range(ds, 'lat', -90.1, 91) is False
+    assert is_in_range(ds, 'rubbish', [-70,90], 'nodata') is False
