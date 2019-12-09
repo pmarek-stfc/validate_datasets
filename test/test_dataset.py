@@ -87,10 +87,12 @@ def test_has_shape_fail_wrong_variable():
 def test_is_in_range_success():
     ds = open_dataset(absolute_path)
 
-    assert is_in_range(ds, 'lat', -70, 90) is True
+    assert is_in_range(ds, 'lat', -90, 90) is True
+    assert is_in_range(ds, 'lon', 0, 360) is True
 
 def test_is_in_range_fail_wrong_data():
     ds = open_dataset(absolute_path)
 
     assert is_in_range(ds, 'lat', -90.1, 91) is False
     assert is_in_range(ds, 'rubbish', [-70,90], 'nodata') is False
+    assert is_in_range(ds, 'lon', -1, 360.01) is False

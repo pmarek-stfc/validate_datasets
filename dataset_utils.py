@@ -2,6 +2,8 @@ import xarray as xr
 import os
 from pathlib import Path
 import glob
+import math
+
 
 
 def has_coordinates(ds, coords):
@@ -95,10 +97,15 @@ def is_in_range(ds, coord_variable, lower_bound, upper_bound):
     :param upper_bound: 90
     :return: Boolean
     """
+    def _roundup(num):
+        rounded_num = int(math.ceil(num / 10.0)) * 10
+        return rounded_num
+
     try:
         lower_bnd = ds.coords[coord_variable].values[0]
-        upper_bnd = ds.coords[coord_variable].values[-1]
-        print(lower_bnd, upper_bnd)
+        #round up in case the upper_bnd was too close to 360 to validate
+        # the range effectively
+        upper_bnd = _roundup(ds.coords[coord_variable].values[-1])
     except Exception:
         return False
 
@@ -110,7 +117,7 @@ def is_in_range(ds, coord_variable, lower_bound, upper_bound):
 
 
 
-def open_dataset(file_to_open):
+def open_file(file_to_open):
     """
         :param file_to_open: netCDF4 files
         :return: opened netCDF dataset
@@ -126,12 +133,12 @@ def main():
     absolute_path = os.path.join(str(Path.home()), fpath)
     files = glob.glob(absolute_path + '/tas_Amon*.nc')
 
-    opened = open_dataset(files[0])
+    opened = open_file(files[0])
     # print(has_attribute(opened, 1, 0, 1))
     # print(has_shape(opened, 'tas'))
-    # print(is_in_range(opened, 'lon', 0, 360))
+    print(is_in_range(opened, 'lon', 0, 360))
     # print(has_variables(opened, []))
-    print(has_coordinates(opened, []))
+    # print(has_coordinates(opened, []))
 
 
 if __name__=='__main__':
