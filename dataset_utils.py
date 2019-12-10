@@ -103,8 +103,8 @@ def is_in_range(ds, coord_variable, lower_bound, upper_bound):
 
     try:
         lower_bnd = ds.coords[coord_variable].values[0]
-        #round up in case the upper_bnd was too close to 360 to validate
-        # the range effectively
+        #round up in case the upper_bnd was too close to valid range
+        # to validate the range effectively
         upper_bnd = _roundup(ds.coords[coord_variable].values[-1])
     except Exception:
         return False
@@ -136,8 +136,8 @@ def main():
     opened = open_file(files[0])
     # print(has_attribute(opened, 1, 0, 1))
     # print(has_shape(opened, 'tas'))
-    print(is_in_range(opened, 'lon', 0, 360))
-    # print(has_variables(opened, []))
+    # print(is_in_range(opened, 'lon', 0, 360))
+    print(has_variables(opened, ['tas']))
     # print(has_coordinates(opened, []))
 
 
