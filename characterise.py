@@ -26,7 +26,7 @@ def _get_var_id(files_found):
     return var_id
 
 class Characterise:
-    def __init__(self, path, project='cmip5', checks={}): #s
+    def __init__(self, path, project='cmip5', checks={}):
         self.path = path
         self.project = project
         self.checks = checks # store results of all checks
@@ -79,7 +79,10 @@ class Characterise:
         :return: 'checks' dictionary with a result
         """
         files_found = glob.glob(self.path + '/*.nc')
-        first_file = files_found[0]
+        try:
+            first_file = files_found[0]
+        except IndexError:
+            return None
         var_ID = _get_var_id(files_found)
 
         ds = open_file(first_file)
@@ -99,7 +102,10 @@ class Characterise:
         :return: 'checks' dictionary with a result
         """
         files_found = glob.glob(self.path + '/*.nc')
-        var_id = _get_var_id(files_found)
+        try:
+            var_id = _get_var_id(files_found)
+        except IndexError:
+            return None
 
         ds = open_mfdatasets(files_found)
         a = set(list(ds[var_id].indexes.keys()))
@@ -158,16 +164,16 @@ class Characterise:
         tuple_result = (num_issues, self.checks)
         return tuple_result
 def main():
-    a = Characterise('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113')
-    a.check_path()
+    # a = Characterise('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113')
+    # a.check_path()
     b = Characterise(
-        '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113/sic')
-    b.check_varnames()
-    b.check_var_in_file()
-    b.check_var_has_coords(["time", "lat", "lon"])
-    b.check_lat_in_range(-90, 90)
-    b.check_lon_in_range(-180, 180)
-    print(b.return_tuple_result())
+        '/rubbis/cmip5/data/nodata')
+    # b.check_varnames()
+    # print(b.check_var_in_file())
+    # print(b.check_var_has_coords(["time", "lat", "lon"]))
+    # b.check_lat_in_range(-90, 90)
+    # b.check_lon_in_range(-180, 180)
+    # print(b.return_tuple_result())
 
 
 if __name__=='__main__':
