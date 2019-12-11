@@ -44,11 +44,11 @@ class Characterise:
                 re.search(regex_condition, split_path[-1]):
             self.checks['path_check'] = 'GOOD'
             print(f'path_check: GOOD')
-            return self.checks
+            return self.checks['path_check']
         else:
             self.checks['path_check'] = 'WRONG PATH'
             print(f'path_check: WRONG PATH')
-            return self.checks
+            return self.checks['path_check']
 
     def check_varnames(self):
         """
@@ -66,11 +66,11 @@ class Characterise:
         if len(var_names) == 1:
             self.checks['varnames_check'] = 'GOOD'
             print(f'varnames_check: GOOD')
-            return self.checks
+            return self.checks['varnames_check']
 
         self.checks['INCONSISTENT VARIABLE NAMES'] = var_names
         print(f'varnames_check: INCONSISTENT VARIABLE NAMES')
-        return self.checks
+        return self.checks['INCONSISTENT VARIABLE NAMES']
 
     def check_var_in_file(self):
         """
@@ -89,11 +89,11 @@ class Characterise:
         if has_variables(ds, [var_ID]):
             self.checks['var_check'] = 'GOOD'
             print(f'var_check: GOOD')
-            return self.checks
+            return self.checks['var_check']
 
         self.checks['var_check'] = 'NOT PRESENT'
         print(f'var_check: NOT PRESENT')
-        return self.checks
+        return self.checks['var_check']
 
     def check_var_has_coords(self, coords):
         """
@@ -112,10 +112,10 @@ class Characterise:
         if a.issubset(coords):
             self.checks['coords_check'] = 'GOOD'
             print(f'coords_check: GOOD')
-            return self.checks
+            return self.checks['coords_check']
         self.checks['coords_check'] = 'WRONG DIMENSIONS', a
         print(f'coords_check: WRONG DIMENSIONS')
-        return self.checks
+        return self.checks['coords_check']
 
     def check_lat_in_range(self, lower_bnd, upper_bnd):
         """
@@ -126,14 +126,18 @@ class Characterise:
         """
         files_found = glob.glob(self.path + '/*.nc')
         ds = open_mfdatasets(files_found)
-        result = is_in_range(ds, 'lat', lower_bnd, upper_bnd)
-        if result:
+        try:
+            result = is_in_range(ds, 'lat', lower_bnd, upper_bnd)
+        except TypeError:
+            return None
+        print(result)
+        if result is True:
             self.checks['latitude_check'] = 'GOOD'
             print(f'latitude_check: GOOD')
-            return self.checks
+            return self.checks['latitude_check']
         self.checks['latitude_check'] = 'INCORRECT RANGE', (lower_bnd, upper_bnd)
         print(f'latitude_check: INCORRECT RANGE')
-        return self.checks
+        return self.checks['latitude_check']
 
     def check_lon_in_range(self, lower_bnd, upper_bnd):
         """
@@ -144,14 +148,17 @@ class Characterise:
         """
         files_found = glob.glob(self.path + '/*.nc')
         ds = open_mfdatasets(files_found)
-        result = is_in_range(ds, 'lon', lower_bnd, upper_bnd)
+        try:
+            result = is_in_range(ds, 'lon', lower_bnd, upper_bnd)
+        except TypeError:
+            return None
         if result:
             self.checks['longitude_check'] = 'GOOD'
             print(f'longitude_check: GOOD')
-            return self.checks
+            return self.checks['longitude_check']
         self.checks['longitude_check'] = 'INCORRECT RANGE', (lower_bnd, upper_bnd)
         print(f'longitude_check: INCORRECT RANGE')
-        return self.checks
+        return self.checks['longitude_check']
 
     def return_tuple_result(self):
         """
@@ -164,16 +171,16 @@ class Characterise:
         tuple_result = (num_issues, self.checks)
         return tuple_result
 def main():
-    # a = Characterise('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113')
+    a = Characterise('/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113')
     # a.check_path()
     b = Characterise(
-        '/rubbis/cmip5/data/nodata')
+        '/home/pmarek/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/rcp45/day/seaIce/day/r1i1p1/v20110113/sic')
     # b.check_varnames()
-    # print(b.check_var_in_file())
-    # print(b.check_var_has_coords(["time", "lat", "lon"]))
-    # b.check_lat_in_range(-90, 90)
-    # b.check_lon_in_range(-180, 180)
-    # print(b.return_tuple_result())
+    # b.check_var_in_file()
+    # b.check_var_has_coords(["time", "lat", "lon"])
+    b.check_lat_in_range(1, 90.5)
+    # b.check_lon_in_range(0, 360)
+    print(b.return_tuple_result())
 
 
 if __name__=='__main__':

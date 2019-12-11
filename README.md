@@ -9,5 +9,7 @@ source setup-env.sh
 ## Test suite
 
 ```
-pytest test
+$ pytest test --> test/test_dataset.py
+$ python -m unittest -v test/test_characterise.py 
+
 ```

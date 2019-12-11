@@ -14,25 +14,27 @@ class TestCharacterise(unittest.TestCase):
 
     def test_check_path_success(self):
         result = self.obj_path_correct.check_path()
-        self.assertEqual(result['path_check'], 'GOOD')
+        self.assertEqual(result, 'GOOD')
 
     def test_check_path_fail(self):
         result = self.obj_path_wrong.check_path()
-        self.assertEqual(result['path_check'], 'WRONG PATH')
+        result2 = self.obj_path_empty.check_path()
+        self.assertEqual(result, 'WRONG PATH')
+        self.assertEqual(result2, 'WRONG PATH')
 
     def test_check_varnames_success(self):
         result = self.obj_path_with_dir.check_varnames()
-        self.assertEqual(result['varnames_check'], 'GOOD')
+        self.assertEqual(result, 'GOOD')
 
     def test_check_varnames_fail(self):
         result = self.obj_path_wrong.check_varnames()
         result2 = self.obj_path_empty.check_varnames()
-        self.assertIn('INCONSISTENT VARIABLE NAMES', result)
-        self.assertIn('INCONSISTENT VARIABLE NAMES', result2)
+        self.assertEqual(result, set())
+        self.assertEqual(result2, set())
 
     def test_check_var_in_file_success(self):
         result = self.obj_path_with_dir.check_var_in_file()
-        self.assertEqual(result['var_check'], 'GOOD')
+        self.assertEqual(result, 'GOOD')
 
     def test_check_var_in_file_fail(self):
         result = self.obj_path_wrong.check_var_in_file()
@@ -42,29 +44,32 @@ class TestCharacterise(unittest.TestCase):
 
     def test_check_var_has_coords_success(self):
         result = self.obj_path_with_dir.check_var_has_coords(["time", "lat", "lon"])
-        self.assertEqual(result['coords_check'], 'GOOD')
+        self.assertEqual(result, 'GOOD')
 
     def test_check_var_has_coords_fail(self):
         result = self.obj_path_wrong.check_var_has_coords(["time", "lat", "lon"])
         result2 = self.obj_path_empty.check_var_has_coords(["time", "lat", "lon"])
+        result3 = self.obj_path_with_dir.check_var_has_coords(["time", "nodata", "rubbish"])
         self.assertIsNone(result)
         self.assertIsNone(result2)
+        self.assertEqual(result3[0], 'WRONG DIMENSIONS')
 
     def test_check_lat_in_range_success(self):
         result = self.obj_path_with_dir.check_lat_in_range(-90, 90)
-        self.assertEqual(result['latitude_check'], 'GOOD')
-    #
-    # def test_check_lat_in_range_fail(self):
-    #     pass
-    #
-    # def test_check_lon_in_range_success(self):
-    #     pass
-    #
-    # def test_check_lon_in_range_fail(self):
-    #     pass
-    #
-    # def test_return_tuple_result_success(self):
-    #     pass
-    #
-    # def test_return_tuple_result_fail(self):
-    #     pass
+        self.assertEqual(result, 'GOOD')
+
+    def test_check_lat_in_range_fail(self):
+        result = self.obj_path_with_dir.check_lat_in_range(-90.5,90.5)
+        result2 = self.obj_path_with_dir.check_lat_in_range('rubbish', 90)
+        self.assertEqual(result[0], 'INCORRECT RANGE')
+        self.assertIsNone(result2)
+
+    def test_check_lon_in_range_success(self):
+        result = self.obj_path_with_dir.check_lon_in_range(0, 360)
+        self.assertEqual(result, 'GOOD')
+
+    def test_check_lon_in_range_fail(self):
+        result = self.obj_path_with_dir.check_lon_in_range(-180, 180)
+        result2 = self.obj_path_with_dir.check_lon_in_range('rubbish', 180)
+        self.assertEqual(result[0], 'INCORRECT RANGE')
+        self.assertIsNone(result2)
